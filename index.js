@@ -83,7 +83,7 @@ app.delete('/tasks/:id', async (req, res) => {
 });
 
 if (process.env.NODE_ENV !== 'test') {
-  const server = app.listen(PORT, () => {
+ app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
