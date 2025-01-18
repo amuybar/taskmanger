@@ -1,5 +1,6 @@
 const express = require("express");
-const {Pool}=require("pg")
+const { pool } = require('./database/db');
+
 const dotenv =require("dotenv")
 
 dotenv.config();
@@ -14,13 +15,7 @@ app.use(express.json());
 //Postress connecton Pool
 
 
-const pool = new Pool({
-  user: process.env.DB_USER || 'task_user',
-  password: process.env.DB_PASS || 'password',
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'task_tracker',
-  port: process.env.DB_PORT || 5432,
-});
+
 
 pool.connect((err, client, release) => {
   if (err) {
@@ -91,3 +86,6 @@ app.delete('/tasks/:id', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
+
+module.exports = app;
