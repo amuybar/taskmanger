@@ -1,27 +1,29 @@
-const request = require('supertest');
-const app = require('../index'); 
-const { pool } = require('../database/db');
+jest.mock('pg'); // Use the mocked pg module
 
+const request = require('supertest');
+const app = require('../index'); // Import the app
+
+const { mockQuery } = require('pg');
 let server;
 
-beforeAll((done) => {
-  // Start the server before tests
-  server = app.listen(() => {
-    console.log('Test server running');
-    done();
-  });
+beforeAll(() => {
+  server = app.listen(3001, () => console.log('Test server running'));
 });
 
-afterAll(async () => {
-  // Close the server and database connections after tests
-  await pool.end(); // Close the PostgreSQL connection pool
+afterAll(() => {
   server.close();
 });
-
 describe('GET /tasks', () => {
+  beforeEach(() => {
+    mockQuery.mockClear();
+  });
+
   it('should return an array of tasks', async () => {
-    const res = await request(server).get('/tasks');
+    mockQuery.mockResolvedValueOnce({ rows: [{ id: 1, title: 'Test Task', description: 'Test Desc', status: 'pending' }] });
+
+    const res = await request(app).get('/tasks');
     expect(res.statusCode).toEqual(200);
     expect(Array.isArray(res.body)).toBe(true);
+    expect(res.body).toEqual([{ id: 1, title: 'Test Task', description: 'Test Desc', status: 'pending' }]);
   });
 });
